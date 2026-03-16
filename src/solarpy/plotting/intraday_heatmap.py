@@ -1,4 +1,4 @@
-"""Visualising intraday time series data as a date × minute heatmap."""
+"""Visualising intraday time series data as a time vs. date heatmap."""
 
 from __future__ import annotations
 
@@ -73,7 +73,7 @@ def plot_intraday_heatmap(
     >>> mins = np.arange(14 * 1440)
     >>> time = np.datetime64("2024-01-01") + mins * np.timedelta64(1, "m")
     >>> values = np.sin(mins / 1440 * np.pi) + np.random.randn(len(mins)) * 0.1
-    >>> fig, ax = plot_time_heatmap(time, values, cmap="RdYlGn")
+    >>> fig, ax = plot_time_heatmap(time, values, cmap="viridis")
     >>> fig.savefig("heatmap.png", dpi=150, bbox_inches="tight")
 
     Ten-minute bins over one year:
@@ -126,7 +126,7 @@ def plot_intraday_heatmap(
     # Figure / axes                                                        #
     # ------------------------------------------------------------------ #
     if ax is None:
-        fig, ax = plt.subplots(figsize=(min(max(6, n_dates * 0.5), 12), 8))
+        fig, ax = plt.subplots(figsize=(min(max(4, n_dates * 0.5), 8), 2))
     fig = ax.figure
 
     # ------------------------------------------------------------------ #
@@ -173,13 +173,13 @@ def plot_intraday_heatmap(
     )
 
     # ------------------------------------------------------------------ #
-    # Y-axis — time of day (HH:MM), ticks every hour, midnight at bottom  #
+    # Y-axis — time of day (HH), ticks every 3 hours, midnight at bottom #
     # ------------------------------------------------------------------ #
-    bins_per_hour = 60 // resolution
+    bins_per_hour = 3*60 // resolution
     tick_bins = np.arange(0, n_bins, bins_per_hour)
     ax.set_yticks(tick_bins + 0.5)
     ax.set_yticklabels(
-        [f"{(b * resolution) // 60:02d}:{(b * resolution) % 60:02d}"
+        [f"{(b * resolution) // 60:02d}"
          for b in tick_bins],
     )
     ax.set_ylabel("Time of day")
