@@ -14,8 +14,10 @@ def plot_intraday_heatmap(
     values: Any,
     resolution: int = 1,
     cmap: str = "viridis",
+    norm=None,
     colorbar_label: str = "",
     ax: plt.Axes = None,
+    pcolormesh_kwargs: dict | None = None,
 ) -> tuple[plt.Figure, plt.Axes]:
     """Plot a heatmap of intraday time series data.
 
@@ -38,8 +40,19 @@ def plot_intraday_heatmap(
         hourly bins, etc.
     cmap : str, optional
         Matplotlib colormap name. Default is ``"viridis"``.
+    norm : matplotlib.colors.Normalize, optional
+        Normalization instance to map data values to the colormap range.
+        Accepts any ``matplotlib.colors`` norm, e.g. ``Normalize``,
+        ``LogNorm``, ``TwoSlopeNorm``, ``BoundaryNorm``. If ``None``
+        (default), linear normalization over the data range is used.
     colorbar_label : str, optional
         Label displayed alongside the colorbar. Default is ``""``.
+    pcolormesh_kwargs : dict, optional
+        Extra keyword arguments forwarded directly to ``ax.pcolormesh``.
+        Useful for parameters not exposed explicitly, such as ``vmin``,
+        ``vmax``, ``alpha``, or ``rasterized``. Note that ``cmap``,
+        ``norm``, and ``shading`` are set by the function and will raise
+        a ``TypeError`` if passed here. Default is ``None``.
     ax : matplotlib.axes.Axes, optional
         Axes to draw on. If ``None``, a new figure and axes are created.
 
@@ -73,7 +86,7 @@ def plot_intraday_heatmap(
     >>> mins = np.arange(14 * 1440)
     >>> time = np.datetime64("2024-01-01") + mins * np.timedelta64(1, "m")
     >>> values = np.sin(mins / 1440 * np.pi) + np.random.randn(len(mins)) * 0.1
-    >>> fig, ax = plot_time_heatmap(time, values, cmap="viridis")
+    >>> fig, ax = plot_intraday_heatmap(time, values, cmap="viridis")
     >>> fig.savefig("heatmap.png", dpi=150, bbox_inches="tight")
 
     Ten-minute bins over one year:
@@ -81,7 +94,7 @@ def plot_intraday_heatmap(
     >>> mins = np.arange(365 * 144) * 10
     >>> time = np.datetime64("2024-01-01") + mins * np.timedelta64(1, "m")
     >>> values = np.random.randn(len(mins))
-    >>> fig, ax = plot_time_heatmap(time, values, resolution=10)
+    >>> fig, ax = plot_intraday_heatmap(time, values, resolution=10)
     """
     time = np.asarray(time, dtype="datetime64[ns]")
     values = np.asarray(values, dtype=float)
@@ -137,21 +150,21 @@ def plot_intraday_heatmap(
         np.arange(n_bins + 1),
         matrix,
         cmap=cmap,
+        norm=norm,
         shading="flat",
+        **(pcolormesh_kwargs or {}),
     )
 
     # ------------------------------------------------------------------ #
     # Colorbar                                                             #
     # ------------------------------------------------------------------ #
-    # cbar = fig.colorbar(mesh, ax=ax, fraction=0.03, pad=0.02)
-
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="2%", pad=0.05)
     cbar = fig.colorbar(mesh, cax=cax)
     cbar.set_label(colorbar_label)
 
     # ------------------------------------------------------------------ #
-    # X-axis — dynamic tick density based on date range                   #
+    # X-axis — dynamic tick density based on date range                  #
     # ------------------------------------------------------------------ #
     if n_dates <= 30:           # daily
         tick_step = 1
