@@ -123,5 +123,5 @@ def shadowband_correction_factor(
     # 7. Return a plain float for scalar input, Series for array input.
     # ------------------------------------------------------------------
     if np.isscalar(input_date) or isinstance(input_date, pd.Timestamp):
-        return float(np.asarray(C))
-    return pd.Series(np.asarray(C), index=dates)
+        return float(C)
+    return pd.Series(C, index=dates)
