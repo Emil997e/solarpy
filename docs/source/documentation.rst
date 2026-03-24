@@ -13,4 +13,6 @@ Code documentation
    plotting.plot_intraday_heatmap
    plotting.plot_shading_heatmap
    horizon.get_horizon_mines
+   quality.bsrn_limits
+   quality.bsrn_limits_flag
    iotools.read_t16
