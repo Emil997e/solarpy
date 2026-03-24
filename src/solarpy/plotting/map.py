@@ -67,7 +67,9 @@ def plot_google_maps(
     --------
     Plot a satellite view of Copenhagen:
 
-    >>> fig, ax = plot_google_maps(55.6761, 12.5683, api_key="YOUR_KEY", zoom=12)
+    >>> import solarpy
+    >>> solarpy.plotting.plot_google_maps(
+    ...     55.6761, 12.5683, api_key="YOUR_KEY", zoom=12)  # doctest: +SKIP
     """
     if ax is None:
         fig, ax = plt.subplots()
@@ -76,8 +78,7 @@ def plot_google_maps(
     params = {
         "center": f"{latitude},{longitude}",
         "zoom": zoom,
-        "size": f"{size[0]}x{size[0]}",
-        "markers": f"color:red|{latitude},{longitude}",
+        "size": f"{size[0]}x{size[1]}",
         "maptype": map_type,
         "key": api_key,
     }
